@@ -8,15 +8,18 @@
 #include "types/enums.hpp"
 
 #include "utilities/flags/flags.hpp"
+#include "algorithms/spn/spn_algorithm.hpp"
 
 Simulation::Simulation(FlagOptions flags) {
     // Hello!
     if (flags.scheduler == "FCFS") {
         // Create a FCFS scheduling algorithm
         this->scheduler = std::make_shared<FCFSScheduler>();
-
-    // TODO: Add your other algorithms as you make them
-    } else {
+    }
+    else if(flags.scheduler == "SPN"){
+      this->scheduler = std::make_shared<SPNScheduler>();
+    }
+    else {
         throw("No scheduler found for " + flags.scheduler);        
     }
     this->flags = flags;
@@ -205,7 +208,27 @@ void Simulation::handle_dispatcher_invoked(const std::shared_ptr<Event> event) {
 //==============================================================================
 
 SystemStats Simulation::calculate_statistics() {
-    // TODO: Calculate the system statistics
+    for (auto entry: this->processes) {
+        for (auto thread: entry.second->threads)
+        {
+            this->system_stats.avg_thread_response_times[entry.second->priority] += thread->response_time();
+            this->system_stats.avg_thread_turnaround_times[entry.second->priority] += thread->turnaround_time();
+            this->system_stats.io_time += thread->io_time;
+            this->system_stats.service_time += thread->service_time;
+            this->system_stats.thread_counts[entry.second->priority]++;
+        }
+    }
+    for (int i = SYSTEM; i <= BATCH; ++i) {
+        if(this->system_stats.thread_counts[i] != 0){
+            this->system_stats.avg_thread_response_times[i] = this->system_stats.avg_thread_response_times[i] / this->system_stats.thread_counts[i];
+            this->system_stats.avg_thread_turnaround_times[i] = this->system_stats.avg_thread_turnaround_times[i] / this->system_stats.thread_counts[i];
+        }
+    }
+    this->system_stats.total_idle_time = this->system_stats.total_time -
+            this->system_stats.service_time -
+            this->system_stats.dispatch_time;
+    this->system_stats.cpu_efficiency = ((float)this->system_stats.service_time / (float)this->system_stats.total_time) * 100;
+    this->system_stats.cpu_utilization = (((float)this->system_stats.total_time - (float)this->system_stats.total_idle_time) / (float)this->system_stats.total_time) * 100;
     return this->system_stats;
 }
 

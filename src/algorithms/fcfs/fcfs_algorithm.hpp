@@ -2,6 +2,7 @@
 #define FCFS_ALGORITHM_HPP
 
 #include <memory>
+#include <queue>
 #include "algorithms/scheduling_algorithm.hpp"
 
 /*
@@ -35,6 +36,7 @@ public:
 
     size_t size() const;
 
+    std::queue<std::shared_ptr<Thread>> queue;
 };
 
 #endif

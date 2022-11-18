@@ -64,7 +64,7 @@ public:
     int end_time = -1;
 
     /*
-        service_time:
+       service_time:
             The service time for the thread. The total time it was spent on the CPU.
     */
     int service_time = 0;

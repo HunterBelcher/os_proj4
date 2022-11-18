@@ -17,15 +17,32 @@ SPNScheduler::SPNScheduler(int slice) {
 }
 
 std::shared_ptr<SchedulingDecision> SPNScheduler::get_next_thread() {
-    // TODO: implement me!
-    return nullptr;
+  auto decision = std::make_shared<SchedulingDecision>();
+  if(!this->queue.empty())
+  {
+    if(this->queue.top()->current_state == READY)
+    {
+      decision->explanation = "Selected from " + std::to_string(this->size()) + " threads. Will run to completion of burst.";
+      decision->thread = this->queue.top();
+      this->queue.pop();
+    }
+    else
+    {
+      decision->explanation = "No threads available for scheduling.";
+    }
+  }
+  else
+  {
+    decision->explanation = "No threads available for scheduling.";
+  }
+  decision->time_slice = -1;
+  return decision;
 }
 
 void SPNScheduler::add_to_ready_queue(std::shared_ptr<Thread> thread) {
-    //TODO: Implement me!
+  this->queue.push(thread->get_next_burst(BurstType::CPU)->length, thread);
 }
 
 size_t SPNScheduler::size() const {
-    //TODo: Implement me
-    return 0;
+    return this->queue.size();
 }
