@@ -9,15 +9,32 @@
 
 #include "utilities/flags/flags.hpp"
 #include "algorithms/spn/spn_algorithm.hpp"
+#include "algorithms/rr/rr_algorithm.hpp"
+#include "algorithms/priority/priority_algorithm.hpp"
+#include "algorithms/mlfq/mlfq_algorithm.hpp"
 
 Simulation::Simulation(FlagOptions flags) {
     // Hello!
     if (flags.scheduler == "FCFS") {
-        // Create a FCFS scheduling algorithm
-        this->scheduler = std::make_shared<FCFSScheduler>();
+      this->scheduler = std::make_shared<FCFSScheduler>();
     }
     else if(flags.scheduler == "SPN"){
       this->scheduler = std::make_shared<SPNScheduler>();
+    }
+    else if(flags.scheduler == "RR"){
+      if(flags.time_slice > 0){
+        this->scheduler = std::make_shared<RRScheduler>(flags.time_slice);
+      }
+      else
+      {
+        this->scheduler = std::make_shared<RRScheduler>();
+      }
+    }
+    else if(flags.scheduler == "PRIORITY"){
+      this->scheduler = std::make_shared<PRIORITYScheduler>();
+    }
+    else if(flags.scheduler == "MFLQ"){
+      this->scheduler = std::make_shared<MFLQScheduler>();
     }
     else {
         throw("No scheduler found for " + flags.scheduler);        

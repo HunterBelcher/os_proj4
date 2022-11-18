@@ -28,7 +28,8 @@ private:
         //  Member variables
         //==================================================
 
-        // TODO: Add any member variables you may need
+    STABLE_PRIORITY_QUEUE::Stable_Priority_Queue<std::shared_ptr<Thread>> queue;
+        int num_threads[4] = {0, 0, 0, 0};
 
 public:
 
